@@ -24,6 +24,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   -->
   <link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.17.0/vis.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.17.0/vis.min.css" rel="stylesheet" type="text/css" />
+
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -280,20 +283,19 @@ desired effect
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Page Header
-        <small>Optional description</small>
+        拓扑图
+        <small>线路1</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-        <li class="active">Here</li>
       </ol>
     </section>
 
     <!-- Main content -->
     <section class="content">
-
+<div style="height: 1000px;" id="canvas"/>
       <!-- Your Page Content Here -->
 
+<div id="mynetwork" style="height:800px;background-color: #222222;"></div>
     </section>
     <!-- /.content -->
   </div>
@@ -396,6 +398,167 @@ desired effect
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/app.min.js"></script>
+<script type="text/javascript">
+
+    var container = document.getElementById('mynetwork');
+
+    var nodes = [
+        {id: 0, label: "线路1", group: 'source'},
+        {id: 1, label: "1", group: 'mints'},
+        {id: 2, label: "2", group: 'mints'},
+        {id: 3, label: "3", group: 'mints'},
+        {id: 4, label: "4", group: 'mints'},
+        {id: 5, label: "5", group: 'mints'},
+        {id: 6, label: "6", group: 'mints'},
+        {id: 7, label: "7", group: 'mints'},
+        {id: 8, label: "8", group: 'mints'},
+        {id: 9, label: "9", group: 'mints'},
+        {id: 10, label: "10", group: 'mints'},
+        {id: 11, label: "11", group: 'mints'},
+        {id: 12, label: "12", group: 'mints'},
+        {id: 13, label: "13", group: 'dotsWithLabel'},
+        {id: 14, label: "14", group: 'mints'},
+         {id: 15, label: "15", group: 'mints'},
+        {id: 16, label: "16", group: 'mints'},
+        {id: 17, label: "17", group: 'dotsWithLabel'},
+        {id: 18, label: "18", group: 'mints'},
+        {id: 19, label: "19", group: 'mints'},
+        {id: 20, label: "20", group: 'diamonds'},
+        {id: 21, label: "21", group: 'mints'},
+        {id: 22, label: "22", group: 'mints'},
+        {id: 23, label: "23", group: 'dotsWithLabel'},
+        {id: 24, label: "24", group: 'mints'},
+        {id: 25, label: "25", group: 'mints'},
+        {id: 26, label: "26", group: 'mints'},
+        {id: 27, label: "27", group: 'mints'},
+        {id: 28, label: "28", group: 'mints'},
+        {id: 29, label: "29", group: 'dotsWithLabel'},
+        {id: 30, label: "30", group: 'mints'},
+        {id: 31, label: "31", group: 'mints'},
+        {id: 32, label: "32", group: 'mints'},
+        {id: 33, label: "33", group: 'mints'},
+        {id: 34, label: "34", group: 'mints'},
+    ];
+
+         var x = - container.clientWidth / 2 - 200;
+      var y = - container.clientHeight / 2 - 200;
+      var step = 70;
+      nodes.push({id: 1000, x: x, y: y, label: '正常', group: 'mints', value: 1, fixed: true, physics:false});
+      nodes.push({id: 1001, x: x, y: y + step, label: '已恢复', group: 'dotsWithLabel', value: 1, fixed: true,  physics:false});
+      nodes.push({id: 1002, x: x, y: y + 2 * step, label: '异常', group: 'diamonds', value: 1, fixed: true,  physics:false});
+
+
+
+    var edges = [
+        {from: 1, to: 0},
+        {from: 2, to: 1},
+        {from: 3, to: 2},
+        {from: 4, to: 3},
+        {from: 5, to: 4},
+        {from: 6, to: 5},
+        {from: 7, to: 4},
+        {from: 8, to: 7},
+        {from: 9, to: 8},
+        {from: 10, to: 7},
+        {from: 11, to: 10},
+        {from: 12, to: 11},
+        {from: 13, to: 12},
+        {from: 14, to: 13},
+        {from: 15, to: 14},
+        {from: 16, to: 15},
+        {from: 17, to: 16},
+        {from: 18, to: 17},
+        {from: 19, to: 18},
+        {from: 20, to: 19},
+        {from: 21, to: 11},
+        {from: 22, to: 21},
+        {from: 23, to: 22},
+        {from: 24, to: 21},
+        {from: 25, to: 24},
+        {from: 26, to: 25},
+        {from: 27, to: 24},
+        {from: 28, to: 27},
+        {from: 29, to: 28},
+        {from: 30, to: 27},
+        {from: 31, to: 30},
+        {from: 32, to: 31},
+        {from: 33, to: 15},
+        {from: 34, to: 33},
+    ]
+
+    // create a network
+
+
+
+
+
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        nodes: {
+            shape: 'dot',
+            size: 20,
+            font: {
+                size: 25,
+                color: '#ffffff'
+            },
+            borderWidth: 2
+        },
+        edges: {
+            width: 2
+        },
+        layout:{
+          randomSeed:331118,
+    improvedLayout:true,
+    hierarchical: {
+      enabled:false,
+      levelSeparation: 150,
+      nodeSpacing: 100,
+      treeSpacing: 200,
+      blockShifting: true,
+      edgeMinimization: true,
+      parentCentralization: true,
+      direction: 'UD',        // UD, DU, LR, RL
+      sortMethod: 'hubsize'   // hubsize, directed
+    }
+      },
+
+        groups: {
+            diamonds: {
+                color: {background:'red',border:'white'},
+                shape: 'diamond'
+            },
+            dotsWithLabel: {
+                label: "I'm a dot!",
+                shape: 'dot',
+                color: 'cyan'
+            },
+            mints: {color:'rgb(0,255,140)'},
+            icons: {
+                shape: 'icon',
+                icon: {
+                    face: 'FontAwesome',
+                    code: '\uf0c0',
+                    size: 50,
+                    color: 'orange'
+                }
+            },
+            source: {
+                color:{border:'white'}
+            }
+        }
+    };
+
+
+
+   var network = new vis.Network(container, data, options);
+
+
+
+
+</script>
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
